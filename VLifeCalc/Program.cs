@@ -85,13 +85,13 @@
                 }
 
                 // トレンドのジャンルを genreList に含まれていない、かつ、空でない場合は繰り返し入力を求める
-                string? trendGenre = null;
+                string? trendGenreInput = null;
                 while (string.IsNullOrWhiteSpace(fixGenre))
                 {
                     Console.Write("トレンドのジャンルを入力してください: ");
-                    trendGenre = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(trendGenre) ||
-                        genreList.Any(g => g.genre == trendGenre))
+                    trendGenreInput = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(trendGenreInput) ||
+                        genreList.Any(g => g.genre == trendGenreInput))
                     {
                         break;
                     }
@@ -100,17 +100,35 @@
 
 
                 // トレンドのネタを topicList に含まれていない、かつ、空でない場合は繰り返し入力を求める
-                string? trendTopic;
+                string? trendTopicInput;
                 while (true)
                 {
                     Console.Write("トレンドのネタを入力してください: ");
-                    trendTopic = Console.ReadLine();
-                    if (string.IsNullOrWhiteSpace(trendTopic) ||
-                        topicList.Any(t => t.topic == trendTopic))
+                    trendTopicInput = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(trendTopicInput) ||
+                        topicList.Any(t => t.topic == trendTopicInput))
                     {
                         break;
                     }
                     Console.WriteLine("ネタが存在しません。もう一度入力してください。");
+                }
+
+                // トレンドのネタを topicList に含まれていない、かつ、空でない場合は繰り返し入力を求める
+                List<(string genreTrend, string topicTrend, int index)> trendList = new();
+                Console.Write("全トレンドを考慮に入れる場合何か入力: ");
+                string? calcTrendInput = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(calcTrendInput))
+                {
+                    trendList.Add((trendGenreInput ?? "", trendTopicInput ?? "", 0));
+                }
+                else
+                {
+                    for (int i = 0; i < 31; i++)
+                    {
+                        int genreIndex = i % genreList.Count;
+                        int topicIndex = i % topicList.Count;
+                        trendList.Add((genreList[genreIndex].genre, topicList[topicIndex].topic, i+1));
+                    }
                 }
 
 
@@ -138,70 +156,74 @@
                                 {
                                     continue;
                                 }
-                                int modify = 10; // 新鮮値ボーナス
-                                if (chara.genre1 == ganre.genre)
+                                foreach (var (trendGenre, trendTopic, day) in trendList)
                                 {
-                                    modify += 15;
-                                }
-                                if (chara.genre2 == ganre.genre)
-                                {
-                                    modify += 10;
-                                }
-                                if (chara.topic1 == topic1.topic || chara.topic1 == topic2.topic)
-                                {
-                                    modify += 15;
-                                }
-                                if (chara.topic2 == topic1.topic || chara.topic2 == topic2.topic)
-                                {
-                                    modify += 15;
-                                }
-                                if (chara.topic3 == topic1.topic || chara.topic3 == topic2.topic)
-                                {
-                                    modify += 10;
-                                }
-                                if (ganre.topics.Contains(topic1.topic))
-                                {
-                                    modify += 5;
-                                }
-                                if (ganre.topics.Contains(topic2.topic))
-                                {
-                                    modify += 5;
-                                }
-                                if (topic1.topics.Contains(topic2.topic))
-                                {
-                                    modify += 5;
-                                }
-                                if (trendGenre == ganre.genre)
-                                {
-                                    modify += 15;
-                                }
-                                if (trendTopic == topic1.topic || trendTopic == topic2.topic)
-                                {
-                                    modify += 10;
-                                }
+                                    // トレンドのジャンルとトピックを設定
+                                    // ループ内で設定することで、全ての組み合わせを試す
 
-                                double qualityRate = (0.2 + (0.4 * topic1.powerRate) + (0.4 * topic2.powerRate)) * ((100 + modify) / 100.0);
-
-
-
-                                if (charaMaxQualityRate < qualityRate)
-                                {
-                                    charaMaxQualityRate = qualityRate;
-                                    charaMaxDatas.Clear();
-                                }
-                                if (charaMaxQualityRate == qualityRate)
-                                {
-                                    string charaMaxData = $"レート: {qualityRate}, キャラ: {chara.name}, ジャンル: {ganre.genre}, トピック1: {topic1.topic}({topic1.power}), トピック2: {topic2.topic}({topic2.power}), 修正値(新鮮値ボーナス込み): {modify}";
-                                    Result result = new Result
+                                    int modify = 10; // 新鮮値ボーナス
+                                    if (chara.genre1 == ganre.genre)
                                     {
-                                        result = charaMaxData,
-                                        qualityRate = qualityRate
-                                    };
+                                        modify += 15;
+                                    }
+                                    if (chara.genre2 == ganre.genre)
+                                    {
+                                        modify += 10;
+                                    }
+                                    if (chara.topic1 == topic1.topic || chara.topic1 == topic2.topic)
+                                    {
+                                        modify += 15;
+                                    }
+                                    if (chara.topic2 == topic1.topic || chara.topic2 == topic2.topic)
+                                    {
+                                        modify += 15;
+                                    }
+                                    if (chara.topic3 == topic1.topic || chara.topic3 == topic2.topic)
+                                    {
+                                        modify += 10;
+                                    }
+                                    if (ganre.topics.Contains(topic1.topic))
+                                    {
+                                        modify += 5;
+                                    }
+                                    if (ganre.topics.Contains(topic2.topic))
+                                    {
+                                        modify += 5;
+                                    }
+                                    if (topic1.topics.Contains(topic2.topic))
+                                    {
+                                        modify += 5;
+                                    }
+                                    if (trendGenre == ganre.genre)
+                                    {
+                                        modify += 15;
+                                    }
+                                    if (trendTopic == topic1.topic || trendTopic == topic2.topic)
+                                    {
+                                        modify += 10;
+                                    }
 
-                                    charaMaxDatas.Add(result);
+                                    double qualityRate = (0.2 + (0.4 * topic1.powerRate) + (0.4 * topic2.powerRate)) * ((100 + modify) / 100.0);
+
+
+
+                                    if (charaMaxQualityRate < qualityRate)
+                                    {
+                                        charaMaxQualityRate = qualityRate;
+                                        charaMaxDatas.Clear();
+                                    }
+                                    if (charaMaxQualityRate == qualityRate)
+                                    {
+                                        string charaMaxData = $"レート: {qualityRate}, キャラ: {chara.name}, ジャンル: {ganre.genre}, トピック1: {topic1.topic}({topic1.power}), トピック2: {topic2.topic}({topic2.power}), トレンド: {trendGenre}-{trendTopic}({day}), 修正値(新鮮値ボーナス込み): {modify}";
+                                        Result result = new Result
+                                        {
+                                            result = charaMaxData,
+                                            qualityRate = qualityRate
+                                        };
+
+                                        charaMaxDatas.Add(result);
+                                    }
                                 }
-
-
                             }
                         }
                     }
