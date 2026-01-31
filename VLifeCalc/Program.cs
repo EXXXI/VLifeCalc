@@ -214,7 +214,8 @@
                                     }
                                     if (charaMaxQualityRate == qualityRate)
                                     {
-                                        string charaMaxData = $"レート: {qualityRate}, キャラ: {chara.name}, ジャンル: {ganre.genre}, トピック1: {topic1.topic}({topic1.power}), トピック2: {topic2.topic}({topic2.power}), トレンド: {trendGenre}-{trendTopic}({day}), 修正値(新鮮値ボーナス込み): {modify}";
+                                        // string charaMaxData = $"レート: {qualityRate}, キャラ: {chara.name}, ジャンル: {ganre.genre}, トピック1: {topic1.topic}({topic1.power}), トピック2: {topic2.topic}({topic2.power}), トレンド: {trendGenre}-{trendTopic}({day}), 修正値(新鮮値ボーナス込み): {modify}";
+                                        string charaMaxData = $"{chara.name},{qualityRate},{ganre.genre},{topic1.topic}({topic1.power}),{topic2.topic}({topic2.power}),({day:00}){trendGenre}-{trendTopic},{modify}";
                                         Result result = new Result
                                         {
                                             result = charaMaxData,
